@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNLIT · 内部系统中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --charcoal: #1e2530;
+  --charcoal-hover: #2b3444;
+  --steel: #3a4657;
+  --brass: #c17f3e;
+  --brass-dim: #a8712f;
+  --bg: #f3f4f6;
+  --paper: #ffffff;
+  --ink: #1a1f26;
+  --ink-mid: #56616f;
+  --ink-faint: #8993a1;
+  --line: #e2e5ea;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  background: var(--charcoal);
+  color: #cfd6e0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.brand {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.brand-mark {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+.brand-sub {
+  font-size: 0.72rem;
+  color: #8993a1;
+  margin-top: 3px;
+  letter-spacing: 0.03em;
+}
+
+.nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 3px;
+  transition: background 0.15s;
+  position: relative;
+}
+.nav-item:hover { background: var(--charcoal-hover); }
+.nav-item.active { background: var(--charcoal-hover); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 8px; bottom: 8px;
+  width: 3px;
+  background: var(--brass);
+  border-radius: 2px;
+}
+.nav-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+.nav-item.active .nav-icon { background: rgba(193,127,62,0.22); }
+.nav-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nav-title {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #e6e9ee;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-desc {
+  font-size: 0.7rem;
+  color: #7a8494;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sidebar-foot {
+  padding: 14px 20px 18px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.7rem;
+  color: #626c7a;
+  line-height: 1.6;
+}
+
+/* ── MAIN ────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+}
+.topbar {
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+.topbar-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--ink);
+}
+.topbar-actions { display: flex; gap: 8px; }
+.tb-btn {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-mid);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.tb-btn:hover { border-color: var(--brass); color: var(--brass-dim); }
+
+.frame-wrap { flex: 1; position: relative; background: var(--paper); }
+.frame-wrap iframe {
+  width: 100%; height: 100%; border: none; display: block;
+}
+.frame-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  background: var(--paper);
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* ── HOME GRID ───────────────────────────────────────── */
+.home {
+  flex: 1;
+  overflow-y: auto;
+  padding: 48px 56px;
+}
+.home-head { max-width: 640px; margin-bottom: 34px; }
+.home-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.7rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.home-sub {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  max-width: 980px;
+}
+.sys-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  background: var(--paper);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.sys-card:hover { border-color: var(--brass); transform: translateY(-1px); }
+.sys-card-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: #f1ede6;
+  color: var(--brass-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+.sys-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+.sys-card-desc {
+  font-size: 0.8rem;
+  color: var(--ink-mid);
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .sidebar { width: 76px; }
+  .brand-sub, .nav-text { display: none; }
+  .brand { padding: 18px 0; text-align: center; }
+  .nav-item { justify-content: center; }
+  .home { padding: 28px 20px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">SUNLIT</div>
+    <div class="brand-sub">内部系统中心</div>
+  </div>
+  <div class="nav" id="nav-list"></div>
+  <div class="sidebar-foot">五个系统独立运行<br>数据互不影响</div>
+</nav>
+
+<div class="main" id="main-area"></div>
+
+<script>
+const SYSTEMS = [
+  { id: 'purchase', title: '采购跟单', desc: '采购单跟单管理', icon: '📋', url: 'https://purchase-shipment-tracker.vercel.app/' },
+  { id: 'order',    title: '客户下单', desc: '客户订单录入', icon: '🧾', url: 'https://ivydeng1987.github.io/-customer-order/' },
+  { id: 'shipment', title: '出货单',   desc: '出货单据生成', icon: '📦', url: 'https://ivydeng1987.github.io/shipment-order-system/' },
+  { id: 'crm',      title: '外贸CRM',  desc: '客户关系与跟进', icon: '🗂️', url: 'https://crm-tools-65w6.vercel.app/' },
+  { id: 'quote',    title: '报价系统', desc: '报价单与AI询价助手', icon: '💬', url: 'https://ivydeng1987.github.io/quotation/' },
+];
+
+let currentId = null;
+const navList = document.getElementById('nav-list');
+const mainArea = document.getElementById('main-area');
+
+function renderNav() {
+  navList.innerHTML = SYSTEMS.map(s => `
+    <div class="nav-item ${s.id === currentId ? 'active' : ''}" onclick="openSystem('${s.id}')">
+      <div class="nav-icon">${s.icon}</div>
+      <div class="nav-text">
+        <div class="nav-title">${s.title}</div>
+        <div class="nav-desc">${s.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHome() {
+  currentId = null;
+  renderNav();
+  mainArea.innerHTML = `
+    <div class="home">
+      <div class="home-head">
+        <div class="home-title">今天要处理哪个系统？</div>
+        <div class="home-sub">选一个系统进入，之后可以随时从左侧切换，不用分别打开多个网页。</div>
+      </div>
+      <div class="card-grid">
+        ${SYSTEMS.map(s => `
+          <div class="sys-card" onclick="openSystem('${s.id}')">
+            <div class="sys-card-icon">${s.icon}</div>
+            <div class="sys-card-title">${s.title}</div>
+            <div class="sys-card-desc">${s.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function openSystem(id) {
+  const sys = SYSTEMS.find(s => s.id === id);
+  if (!sys) return;
+  currentId = id;
+  renderNav();
+  mainArea.innerHTML = `
+    <div class="topbar">
+      <div class="topbar-title">${sys.title}</div>
+      <div class="topbar-actions">
+        <a class="tb-btn" href="${sys.url}" target="_blank" rel="noopener" title="在新标签页打开">↗</a>
+        <div class="tb-btn" onclick="reloadFrame()" title="刷新">⟳</div>
+        <div class="tb-btn" onclick="renderHome()" title="返回首页">⌂</div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-loading" id="frame-loading">正在加载 ${sys.title}…</div>
+      <iframe id="active-frame" src="${sys.url}" onload="document.getElementById('frame-loading').style.opacity='0'"></iframe>
+    </div>
+  `;
+}
+
+function reloadFrame() {
+  const f = document.getElementById('active-frame');
+  if (f) f.src = f.src;
+}
+
+// 记住上次打开的系统，方便下次直接进入常用的那个
+window.addEventListener('DOMContentLoaded', () => {
+  const last = localStorage.getItem('sunlit_hub_last');
+  if (last && SYSTEMS.find(s => s.id === last)) {
+    openSystem(last);
+  } else {
+    renderHome();
+  }
+});
+
+const _openSystem = openSystem;
+openSystem = function(id) {
+  localStorage.setItem('sunlit_hub_last', id);
+  _openSystem(id);
+};
+</script>
+</body>
+</html>
