@@ -151,17 +151,10 @@ body {
 
 .frame-wrap { flex: 1; position: relative; background: var(--paper); }
 .frame-wrap iframe {
-  width: 100%; height: 100%; border: none; display: block;
-}
-.frame-loading {
   position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--ink-faint);
-  font-size: 0.85rem;
-  background: var(--paper);
-  pointer-events: none;
-  transition: opacity 0.2s;
+  width: 100%; height: 100%; border: none; display: none;
 }
+.frame-view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
 /* ── HOME GRID ───────────────────────────────────────── */
 .home {
@@ -239,7 +232,26 @@ body {
   <div class="sidebar-foot">五个系统独立运行<br>数据互不影响</div>
 </nav>
 
-<div class="main" id="main-area"></div>
+<div class="main">
+  <div class="home" id="home-view">
+    <div class="home-head">
+      <div class="home-title">今天要处理哪个系统？</div>
+      <div class="home-sub">选一个系统进入，之后可以随时从左侧切换，不用分别打开多个网页。</div>
+    </div>
+    <div class="card-grid" id="home-cards"></div>
+  </div>
+  <div class="frame-view" id="frame-view" style="display:none;">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title"></div>
+      <div class="topbar-actions">
+        <a class="tb-btn" id="tb-open-new" href="#" target="_blank" rel="noopener" title="在新标签页打开">↗</a>
+        <div class="tb-btn" onclick="reloadFrame()" title="刷新">⟳</div>
+        <div class="tb-btn" onclick="renderHome()" title="返回首页">⌂</div>
+      </div>
+    </div>
+    <div class="frame-wrap" id="frame-wrap"></div>
+  </div>
+</div>
 
 <script>
 const SYSTEMS = [
@@ -252,7 +264,12 @@ const SYSTEMS = [
 
 let currentId = null;
 const navList = document.getElementById('nav-list');
-const mainArea = document.getElementById('main-area');
+const homeView = document.getElementById('home-view');
+const frameView = document.getElementById('frame-view');
+const homeCards = document.getElementById('home-cards');
+const frameWrap = document.getElementById('frame-wrap');
+const topbarTitle = document.getElementById('topbar-title');
+const tbOpenNew = document.getElementById('tb-open-new');
 
 function renderNav() {
   navList.innerHTML = SYSTEMS.map(s => `
@@ -266,53 +283,53 @@ function renderNav() {
   `).join('');
 }
 
+function renderHomeCards() {
+  homeCards.innerHTML = SYSTEMS.map(s => `
+    <div class="sys-card" onclick="openSystem('${s.id}')">
+      <div class="sys-card-icon">${s.icon}</div>
+      <div class="sys-card-title">${s.title}</div>
+      <div class="sys-card-desc">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
 function renderHome() {
   currentId = null;
   renderNav();
-  mainArea.innerHTML = `
-    <div class="home">
-      <div class="home-head">
-        <div class="home-title">今天要处理哪个系统？</div>
-        <div class="home-sub">选一个系统进入，之后可以随时从左侧切换，不用分别打开多个网页。</div>
-      </div>
-      <div class="card-grid">
-        ${SYSTEMS.map(s => `
-          <div class="sys-card" onclick="openSystem('${s.id}')">
-            <div class="sys-card-icon">${s.icon}</div>
-            <div class="sys-card-title">${s.title}</div>
-            <div class="sys-card-desc">${s.desc}</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
+  frameView.style.display = 'none';
+  homeView.style.display = 'block';
 }
 
+// 已经打开过的系统会一直挂载在这里，切走只是隐藏，不会被销毁重建，
+// 所以已经登录/填写到一半的内容都还在，不会因为切换又要重新输入密码
 function openSystem(id) {
   const sys = SYSTEMS.find(s => s.id === id);
   if (!sys) return;
   currentId = id;
   renderNav();
-  mainArea.innerHTML = `
-    <div class="topbar">
-      <div class="topbar-title">${sys.title}</div>
-      <div class="topbar-actions">
-        <a class="tb-btn" href="${sys.url}" target="_blank" rel="noopener" title="在新标签页打开">↗</a>
-        <div class="tb-btn" onclick="reloadFrame()" title="刷新">⟳</div>
-        <div class="tb-btn" onclick="renderHome()" title="返回首页">⌂</div>
-      </div>
-    </div>
-    <div class="frame-wrap">
-      <div class="frame-loading" id="frame-loading">正在加载 ${sys.title}…</div>
-      <iframe id="active-frame" src="${sys.url}" onload="document.getElementById('frame-loading').style.opacity='0'"></iframe>
-    </div>
-  `;
+  homeView.style.display = 'none';
+  frameView.style.display = 'flex';
+  topbarTitle.textContent = sys.title;
+  tbOpenNew.href = sys.url;
+
+  frameWrap.querySelectorAll('iframe').forEach(f => { f.style.display = 'none'; });
+
+  let frame = document.getElementById('frame-' + id);
+  if (!frame) {
+    frame = document.createElement('iframe');
+    frame.id = 'frame-' + id;
+    frame.src = sys.url;
+    frameWrap.appendChild(frame);
+  }
+  frame.style.display = 'block';
 }
 
 function reloadFrame() {
-  const f = document.getElementById('active-frame');
-  if (f) f.src = f.src;
+  const frame = document.getElementById('frame-' + currentId);
+  if (frame) frame.src = frame.src;
 }
+
+renderHomeCards();
 
 // 记住上次打开的系统，方便下次直接进入常用的那个
 window.addEventListener('DOMContentLoaded', () => {
